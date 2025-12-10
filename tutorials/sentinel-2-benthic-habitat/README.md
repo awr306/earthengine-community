@@ -4,14 +4,29 @@ This tutorial demonstrates processing Sentinel-2 Level 2A Multi-Spectral Instrum
 
 ## Overview
 
-The workflow includes:
+This tutorial consists of **two parts**:
+
+### Part 1: Unsupervised Classification (`index.ipynb`)
 
 1. **Sun Glint Removal (Deglinting)** - Hedley et al. (2005) method to remove specular reflection from water surface
 2. **Depth Invariant Index (DII) Calculation** - Multiple band ratios to reduce depth effects on substrate classification
 3. **K-Means Unsupervised Classification** - Clustering algorithm to identify distinct benthic habitat types
 
+### Part 2: Supervised Classification (`supervised-classification.ipynb`)
+
+**NEW!** Use your field survey data for improved classification:
+
+1. **Load Ground Truth Shapefile** - Import field survey points/polygons
+2. **Extract Training Samples** - Sample imagery at ground truth locations
+3. **Train Multiple Classifiers** - Random Forest, SVM, and CART
+4. **Accuracy Assessment** - Confusion matrix and per-class accuracy
+5. **Habitat Area Analysis** - Calculate area statistics per class
+
+**When to use Part 2:** If you have field survey data (shapefile with habitat types), start here for more accurate results!
+
 ## Features
 
+### Part 1 (Unsupervised):
 - ✅ Google Drive integration for data loading
 - ✅ Hedley deglinting algorithm implementation
 - ✅ Multiple DII indices (B2/B3, B3/B4, NDWI)
@@ -19,6 +34,16 @@ The workflow includes:
 - ✅ Interactive visualization with Folium
 - ✅ Area statistics and analysis
 - ✅ Export results to Google Drive
+
+### Part 2 (Supervised):
+- ✅ Ground truth shapefile import (points or polygons)
+- ✅ Automatic training sample extraction
+- ✅ Multiple classifiers: Random Forest, SVM, CART
+- ✅ Accuracy assessment with confusion matrix
+- ✅ Per-class accuracy metrics (Producer's/User's accuracy)
+- ✅ Classifier comparison and automatic best selection
+- ✅ Visual validation with ground truth overlay
+- ✅ Detailed classification reports
 
 ## Requirements
 
@@ -28,6 +53,8 @@ The workflow includes:
 - Shapefile defining Area of Interest (AOI)
 
 ## Data Preparation
+
+### For Part 1 (Unsupervised):
 
 Upload the following to your Google Drive:
 
@@ -43,6 +70,33 @@ Google Drive/
     ├── aoi.dbf
     └── aoi.prj
 ```
+
+### For Part 2 (Supervised) - Additional Requirements:
+
+Add **ground truth shapefile** from field survey:
+
+```
+Google Drive/
+└── sentinel_benthic_data/
+    ├── aoi.shp
+    ├── ground_truth.shp     ← Field survey data
+    ├── ground_truth.shx
+    ├── ground_truth.dbf
+    └── ground_truth.prj
+```
+
+**Ground Truth Shapefile Requirements:**
+- Can be **points** (GPS locations) or **polygons** (habitat areas)
+- Must have a column containing **habitat class names** (e.g., 'coral', 'seagrass', 'sand')
+- Column can be named: 'class', 'habitat', 'type', or any name (you'll specify in the notebook)
+- Recommended: **At least 50 samples per habitat class** for good accuracy
+- Example attributes table:
+
+| ID | habitat  | depth | date       |
+|----|----------|-------|------------|
+| 1  | coral    | 5.2   | 2024-03-15 |
+| 2  | seagrass | 3.8   | 2024-03-15 |
+| 3  | sand     | 2.1   | 2024-03-15 |
 
 ## Usage
 
@@ -72,12 +126,12 @@ Google Drive/
 
 ## Output
 
-The notebook generates:
+### Part 1 Output:
 
 1. **Interactive maps** showing:
    - Original vs deglinted imagery
    - Depth invariant indices
-   - Classification results
+   - K-Means classification results
 
 2. **Exported files** (to Google Drive):
    - Classified habitat map
@@ -87,6 +141,28 @@ The notebook generates:
 3. **Statistics**:
    - Area by habitat class
    - Distribution pie chart
+
+### Part 2 Output:
+
+1. **Accuracy metrics**:
+   - Overall accuracy (typically 70-95% with good ground truth)
+   - Kappa coefficient
+   - Confusion matrix
+   - Producer's and User's accuracy per class
+
+2. **Comparison charts**:
+   - Classifier performance comparison
+   - Per-class accuracy visualization
+
+3. **Exported files** (to Google Drive):
+   - Best classifier result (GeoTIFF)
+   - Classification report (TXT)
+   - Area statistics (CSV)
+
+4. **Interactive maps**:
+   - Side-by-side classifier comparison
+   - Ground truth overlay for validation
+   - Habitat distribution maps
 
 ## Interpretation Guide
 
