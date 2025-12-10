@@ -219,6 +219,51 @@ Classification results typically identify:
 **Issue**: Too many/few clusters
 - **Solution**: Adjust `n_clusters` parameter based on expected habitat diversity
 
+### Part 2 (Supervised Classification) Troubleshooting
+
+**Issue**: `HttpError 400: Property 'class' of feature '0_0': Invalid type. Expected type: Float. Actual type: String`
+- **Cause**: Ground truth shapefile has text class names (e.g., 'Seagrass', 'Coral') but Earth Engine expects numeric values
+- **Solution**: **DON'T manually change your shapefile!** The notebook now automatically converts text to numbers:
+  - Cell 17 creates a mapping: `{'Coral': 0, 'Seagrass': 1, 'Sand': 2, ...}`
+  - Text labels are converted to numbers internally
+  - Results are converted back to text for display
+  - **Just re-run the notebook with the updated version**
+
+**Issue**: "Column 'habitat' not found"
+- **Cause**: Your shapefile uses a different column name for habitat types
+- **Solution**: Check your shapefile's attribute table and update `class_column` variable:
+  ```python
+  class_column = 'Kelas_Baru'  # or 'type', 'class', etc.
+  ```
+
+**Issue**: "Insufficient training samples"
+- **Cause**: Not enough ground truth points for reliable classification
+- **Solution**:
+  - Add more field survey points (aim for 50+ per class)
+  - Use polygon sampling instead of points
+  - Reduce number of classes if some are rare
+
+**Issue**: Low accuracy (<60%)
+- **Possible causes**:
+  - Ground truth data quality issues
+  - Survey date too far from satellite image date
+  - Habitat changed between survey and image date
+  - Poor image quality (clouds, glint, turbidity)
+- **Solutions**:
+  - Validate ground truth in field
+  - Select image closer to survey date
+  - Add more training samples
+  - Adjust classifier parameters
+  - Check for labeling errors in shapefile
+
+**Issue**: Confusion matrix shows high confusion between certain classes
+- **Cause**: Classes are spectrally similar or overlap spatially
+- **Solutions**:
+  - Combine similar classes (e.g., 'dense seagrass' + 'sparse seagrass' → 'seagrass')
+  - Add more discriminating bands/indices
+  - Use texture features
+  - Check if ground truth points are in transition zones
+
 ## License
 
 Copyright 2025 The Earth Engine Community Authors
